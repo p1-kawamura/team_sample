@@ -1,0 +1,556 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="icon" href="{% static 'sanma.gif' %}">
+
+    <title>店舗用サンプル在庫表</title>
+
+</head>
+<body>
+    <div class="mt-3 mb-5">
+
+        <!-- メニュー -->
+        <div class="flex3" style="margin: 0 auto; width: 1000px;">
+            <div>
+                <a href="https://www.p1-intl.com/" target="_blank"><img src="{% static 'logo.png' %}"></a>
+            </div>
+            <div style="margin-left: 30px;">
+                <a href="{% url 'sample:index' %}"><button type="button" class="btn btn-dark">サンプル在庫表</button></a>
+            </div>
+            <div style="margin-left: 30px;">
+                <a href="{% url 'sample:henshu_index' %}"><button type="button" class="btn btn-outline-dark">サンプル登録 / 編集</button></a>
+            </div>
+            <div style="margin-left: 30px;">
+                <a href="{% url 'sample:size_index' %}"><button type="button" class="btn btn-outline-dark">サイズ編集</button></a>
+            </div>
+        </div>
+        <hr>
+
+        <!-- タイトル -->
+        <div class="mt-5" style="margin: 0 auto; text-align: center; width: 1000px;">
+            {% if team == "全店舗" %}
+            <h2 class="title" id="title_team">全店舗</h2>
+            {% elif team == "東京" %}
+            <h2 class="title title_team_tokyo" id="title_team">東京</h2>
+            {% elif team == "大阪" %}
+            <h2 class="title title_team_osaka" id="title_team">大阪</h2>
+            {% elif team == "高松" %}
+            <h2 class="title title_team_takamatsu" id="title_team">高松</h2>
+            {% elif team == "福岡" %}
+            <h2 class="title title_team_fukuoka" id="title_team">福岡</h2>
+            {% endif %}
+        </div>
+
+        <!-- 商品検索 -->
+        <div style="margin: 0 auto; width: 1000px;">
+            <div class="flex3 mt-3">
+                <div>対象店舗：</div>
+                <div>
+                    <select class="form-control form-select" id="team_select">
+                        {% for i in team_list %}
+                            {% if i == team %}
+                            <option value="{{i}}" selected>{{i}}</option>
+                            {% else %}
+                            <option value="{{i}}">{{i}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="margin-left: 50px;">
+                    {% if rental_now == "true" %}
+                    <input class="form-check-input" type="checkbox" id="rental_now" checked> 貸出中のみ表示
+                    {% else %}
+                    <input class="form-check-input" type="checkbox" id="rental_now"> 貸出中のみ表示
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex2 mt-4">
+                <div>
+                    <div class="flex3">
+                        <div>品番検索：</div>
+                        <div style="width: 150px;"><input class="form-control" type="text" id="hinban_enter" value="{{hinban_enter}}"></div>
+                    </div>
+                </div>
+                <div style="margin-left: 30px;">
+                    <select class="form-control" id="hinban" style="width: 200px; height:150px;" size="5">
+                        {% for i in hinban_list %}
+                            {% if i == hinban %}
+                            <option value="{{i}}" selected>{{i}}</option>
+                            {% else %}
+                            <option value="{{i}}">{{i}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="margin-left: 30px;">
+                    <select class="form-control" id="color" name="color_size" style="font-size: 0.9em; width: 250px; height:150px;" multiple>
+                        {% for i,h in color_dic.items %}
+                            {% if h == 1 %}
+                            <option value="{{i}}" selected>{{i}}</option>
+                            {% else %}
+                            <option value="{{i}}">{{i}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="margin-left: 30px;">
+                    <select class="form-control" id="size" name="color_size" style="width: 150px; height:150px;" multiple>
+                        {% for i,h in size_dic.items %}
+                            {% if h == 1 %}
+                            <option value="{{i}}" selected>{{i}}</option>
+                            {% else %}
+                            <option value="{{i}}">{{i}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品名 -->
+        <div class="flex mt-5" style="margin: 0 auto; width: 1100px; justify-content: space-between; align-items: center;">
+            <div style="margin-left: 10px; width: 500px; font-weight: bold;">
+                {% if shouhin_name %}
+                <div class="shouhin_name"  id="shouhin_name">{{shouhin_name}}</div>
+                {% else %}
+                <div class="shouhin_name"  id="shouhin_name" style="visibility: hidden;">{{shouhin_name}}</div>
+                {% endif %}
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary" id="rental_basket" data-bs-toggle="modal" data-bs-target="#rental_modal">
+                    <span style="font-size: 1.2em;"><i class="bi bi-cart4"></i></span> 貸出リスト（<span id="rental_count">{{rental_count}}</span>）
+                </button>
+            </div>             
+        </div>
+        
+        
+        <!-- 商品リスト -->
+        <div class="mt-4" id="item_list" style="margin: 0 auto; width: 1100px;">
+            {% for i in item_list %}
+                {% if i.rental_day %}
+                <div class="flex3 main_all main_rental">
+                {% elif i.team == "東京" %}
+                <div class="flex3 main_all main_tokyo">
+                {% elif i.team == "大阪" %}
+                <div class="flex3 main_all main_osaka">
+                {% elif i.team == "高松" %}
+                <div class="flex3 main_all main_takamatsu">
+                {% elif i.team == "福岡" %}
+                <div class="flex3 main_all main_fukuoka">
+                {% endif %}
+                    <div style="width: 65px;">{{i.team}}</div>
+                    <div style="width: 105px;">
+                        {% if i.rental_day %}
+                        <div class="rental_icon" title="■貸出日：{{i.rental_day}}　■担当：{{i.rental_tantou}}　■顧客：{{i.rental_cus}}">貸出中</div>
+                        {% endif %}
+                    </div>
+                    <div style="width: 200px;">{{i.color}}</div>
+                    <div style="width: 150px;">{{i.size}}</div>
+                    <div style="width: 240px; cursor: pointer;" title="{{i.tana}}">
+                        <span class="tana_icon">棚</span> {% if i.tana %}{{i.tana | truncatechars:15}}{% endif %}
+                    </div>
+                    <div style="width: 240px; cursor: pointer;" title="{{i.bikou}}">
+                        <span class="tana_icon">備</span> {% if i.bikou %}{{i.bikou | truncatechars:15}}{% endif %}
+                    </div>
+                    <div style="text-align: right; width: 50px;">
+                        {% if i.rental_day %}
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="return_{{i.hontai_num}}" name="btn_return"
+                            data-bs-toggle="modal" data-bs-target="#return_modal">返却</button>
+                        {% else %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="rental_{{i.hontai_num}}" name="btn_rental"
+                            data-bs-toggle="modal" data-bs-target="#rental_modal">貸出</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+
+        <!-- モーダル1　返却 -->
+        <div class="modal fade" id="return_modal" tabindex="-1" role="dialog" aria-labelledby="modal_1" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div id="modal_return_num" style="display: none;"></div>
+                        <div><h5 class="modal-title" id="modal_1" style="color: #f75f58;">サンプル返却処理を行いますか？</h5></div>
+                    </div>
+                    <div class="modal-body">
+                        <div id="modal_return_sample_1"></div>
+                        <div id="modal_return_sample_2" style="margin-top: 10px;"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="flex">
+                            <div style="margin-left: 30px;">
+                                <button type="button" class="btn btn-danger" id="return_ok">はい</button>
+                            </div>
+                            <div style="margin-left: 30px;">
+                                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close">いいえ</button>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+
+        <!-- モーダル2　貸出 -->
+        <div class="modal fade" id="rental_modal" tabindex="-1" role="dialog" aria-labelledby="modal_2" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal_2" style="color: #f75f58;">担当者と顧客名を入力してください。</h5>
+                        <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal" aria-label="Close">続けてサンプルを選択する</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="rental_table"></div>
+                        <div class="mt-5 mb-4" style="margin-left: 150px;">
+                            <div class="flex3 mt-4">
+                                <div>担当者：</div>
+                                <div><input class="form-control" type="text" id="rental_tantou" style="width: 150px;"></div>
+                            </div>
+                            <div class="flex3 mt-4">
+                                <div>顧客名：</div>
+                                <div><input class="form-control" type="text" id="rental_cus" style="width: 400px;"></div>
+                            </div>
+                            <div class="mt-5">
+                                <button type="button" class="btn btn-outline-primary" id="rental_ok" style="height: 4em;">
+                                    <img src="{% static 'sanma.gif' %}"> >> ほな、 上記サンプルを貸出しまっせ！（クリックして確定）
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div> 
+
+    </div>
+
+
+
+    <!-- 各種Ajax -->
+    <script>
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i <cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+  
+        var csrftoken = getCookie('csrftoken');
+  
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+  
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+  
+
+
+        //品番検索
+        var hinban_enter = document.getElementById("hinban_enter");
+        hinban_enter.addEventListener("input",function(){
+            document.getElementById("hinban").innerHTML="";
+            document.getElementById("color").innerHTML="";
+            document.getElementById("size").innerHTML="";
+            document.getElementById("shouhin_name").style.visibility="hidden";
+            document.getElementById("item_list").style.visibility="hidden";
+            if (hinban_enter.value == ""){
+                document.getElementById("hinban").innerHTML="";
+                return
+            };
+            $.ajax({
+                'url': '{% url "sample:hinban_enter" %}',
+                'type': 'POST',
+                'data': {
+                    'hinban_enter': hinban_enter.value,
+                    'team': document.getElementById("team_select").value
+                },
+                'dataType': 'json'
+            })
+            .done(function(response){
+                var list = "";
+                if (response.hinban_list.length == 0){
+                    list='<option></option>';
+                } else {
+                    for (var i of response.hinban_list){
+                        list = list + '<option>' + i + '</option>';
+                    }
+                };
+                document.getElementById("hinban").innerHTML=list;
+                document.getElementById("color").innerHTML="";
+                document.getElementById("size").innerHTML="";
+            });
+        });
+
+
+        //品番選択
+        var hinban = document.getElementById("hinban");
+        hinban.addEventListener("click",function(){
+            if (hinban.value != ""){
+                $.ajax({
+                    'url': '{% url "sample:hinban_click" %}',
+                    'type': 'POST',
+                    'data': {
+                        'hinban_enter': document.getElementById("hinban_enter").value,
+                        'hinban': hinban.value,
+                        'team': document.getElementById("team_select").value
+                        },
+                    'dataType': 'json'
+                })
+                .done(function(response){
+                    window.location.href="{% url 'sample:index' %}";
+                });
+            };
+        });
+
+
+        // 店舗選択
+        var team_select = document.getElementById("team_select");
+        team_select.addEventListener("change",function(){
+            team_color_size();
+        });
+
+
+        //カラー_サイズ選択
+        var color_size = document.getElementsByName("color_size");
+        for (var i=0; i<color_size.length; i++){
+            color_size[i].addEventListener("click",function(){
+                team_color_size();
+            });
+        };
+        
+
+        // 店舗、カラー、サイズ共通
+        function team_color_size(){
+            var hinban = document.getElementById("hinban");
+            var color=[];
+            var elm=document.getElementById("color").options;
+            for (i=0 ; i<elm.length ; i++){
+                if (elm[i].selected){
+                    color.push(elm[i].value);
+                };
+            };
+            var size=[];
+            elm=document.getElementById("size").options;
+            for (i=0 ; i<elm.length ; i++){
+                if (elm[i].selected){
+                    size.push(elm[i].value);
+                };
+            };
+            color=JSON.stringify(color);
+            size=JSON.stringify(size);
+
+            $.ajax({
+                'url': '{% url "sample:team_color_size_click" %}',
+                'type': 'POST',
+                'data': {
+                    'team': document.getElementById("team_select").value,
+                    'hinban_enter': document.getElementById("hinban_enter").value,
+                    'hinban': hinban.value,
+                    'color':color,
+                    'size':size,
+                    },
+                'dataType': 'json'
+            })
+            .done(function(response){
+                window.location.href="{% url 'sample:index' %}";
+            });
+        };
+        
+
+        // 貸出中のみ表示
+        document.getElementById("rental_now").addEventListener("click",function(){
+            $.ajax({
+                'url': '{% url "sample:rental_now" %}',
+                'type': 'POST',
+                'data': {
+                    'team': document.getElementById("team_select").value,
+                    'rental': document.getElementById("rental_now").checked,
+                    },
+                'dataType': 'json'
+            })
+            .done(function(response){
+                window.location.href="{% url 'sample:index' %}";
+            });
+        });
+
+
+        // 返却モーダル                
+        $("#return_modal").on("show.bs.modal", function (event) {
+            var btn_return = document.getElementsByName("btn_return");
+            for (var i=0; i<btn_return.length; i++){
+                btn_return[i].addEventListener("click",function(){
+                    hontai_num=this.id.replace("return_","");
+                    $.ajax({
+                        'url': '{% url "sample:return_modal" %}',
+                        'type': 'POST',
+                        'data': {'hontai_num': hontai_num},
+                        'dataType': 'json'
+                    })
+                    .done(function(response){
+                        res=response.sample;
+                        document.getElementById("modal_return_num").innerText=hontai_num;
+                        document.getElementById("modal_return_sample_1").innerText="店舗：" + res[0];
+                        document.getElementById("modal_return_sample_2").innerText=res[1];
+                    });
+                });
+            };
+        });
+
+
+        // 返却決定
+        document.getElementById("return_ok").addEventListener("click",function(){
+            $.ajax({
+                'url': '{% url "sample:return_ok" %}',
+                'type': 'POST',
+                'data': {'hontai_num': hontai_num},
+                'dataType': 'json'
+            })
+            .done(function(response){
+                window.location.reload();
+                window.alert("返却処理が完了しました！");
+            });
+        });
+
+        
+        // 貸出モーダル（買い物かごから）       
+        $("#rental_modal").on("show.bs.modal", function (event) {
+            document.getElementById("rental_basket").addEventListener("click",function(){
+                $.ajax({
+                    'url': '{% url "sample:rental_basket" %}',
+                    'type': 'POST',
+                })
+                .done(function(response){
+                    res=response.rental_list;
+                    modal_list(res);
+                });
+            });
+        });
+
+
+        // 貸出モーダル（各ボタンから）       
+        $("#rental_modal").on("show.bs.modal", function (event) {
+            var btn_rental = document.getElementsByName("btn_rental");
+            for (var i=0; i<btn_rental.length; i++){
+                btn_rental[i].addEventListener("click",function(){
+                    hontai_num=Number(this.id.replace("rental_",""));
+                    $.ajax({
+                        'url': '{% url "sample:rental_modal" %}',
+                        'type': 'POST',
+                        'data': {'hontai_num': hontai_num,"kubun":"add"},
+                        'dataType': 'json'
+                    })
+                    .done(function(response){
+                        res=response.rental_list;
+                        modal_list(res);
+                    });
+                });
+            };
+        });
+
+
+        // 貸出リストから削除
+        function rental_del(){
+            var rental_del = document.getElementsByName("rental_del");
+            for (var i=0; i<rental_del.length; i++){
+                rental_del[i].addEventListener("click",function(){
+                    hontai_num=Number(this.id.replace("rental_del_",""));
+                    $.ajax({
+                        'url': '{% url "sample:rental_modal" %}',
+                        'type': 'POST',
+                        'data': {'hontai_num': hontai_num,"kubun":"del"},
+                        'dataType': 'json'
+                    })
+                    .done(function(response){
+                        res=response.rental_list;
+                        if (res.length==0){
+                            window.location.reload();
+                        } else {
+                            modal_list(res);
+                        };                        
+                    });
+                });
+            };
+        };
+        
+
+        // 貸出リスト表示
+        function modal_list(res){
+            var str = "";
+            for (var i of res){
+                str = str + "<tr style='vertical-align: middle;'><td>" + i[1] + "</td><td>" + i[2]  + 
+                    "</td><td>" + i[3]  + "</td><td>" + i[4]  + "</td><td>" + i[5] + "</td><td style='text-align:center;'>" + 
+                    "<button type='button' class='btn btn-outline-dark btn-sm' name='rental_del' id='rental_del_" + i[0] + "'>" + 
+                    "<i class='bi bi-x-lg'></i></button></td></tr>";
+            };
+            str="<table class='table table-bordered'><tr class='table-secondary'><th>店舗</th><th>品番</th><th>品名</th><th>カラー</th><th>サイズ</th><th></th></tr>" +
+                    str + "</table>";
+            document.getElementById("rental_table").innerHTML=str;
+            document.getElementById("rental_count").innerText=res.length;
+            rental_del();
+        };
+
+
+        // 貸出決定
+        document.getElementById("rental_ok").addEventListener("click",function(){
+            var tantou = document.getElementById("rental_tantou").value;
+            var cus = document.getElementById("rental_cus").value;
+            if (tantou == ""){
+                window.alert("担当者を入力してください！");
+                return
+            } else if (cus == ""){
+                window.alert("顧客名を入力してください！");
+                return
+            };
+
+            $.ajax({
+                'url': '{% url "sample:rental_ok" %}',
+                'type': 'POST',
+                'data': {
+                    'tantou':tantou,
+                    "cus":cus,
+                },
+                'dataType': 'json'
+            })
+            .done(function(response){
+                window.location.reload();
+                window.alert("貸出処理が完了しました！");
+            });
+        });
+
+
+
+
+    </script>
+
+    <!-- モーダル用 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+</body>
+</html>

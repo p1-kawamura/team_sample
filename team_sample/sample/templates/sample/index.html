@@ -152,8 +152,17 @@
                         <div class="rental_icon" title="■貸出日：{{i.rental_day}}　■担当：{{i.rental_tantou}}　■顧客：{{i.rental_cus}}">貸出中</div>
                         {% endif %}
                     </div>
-                    <div style="width: 200px;">{{i.color}}</div>
-                    <div style="width: 150px;">{{i.size}}</div>
+                    <div>
+                        {% if rental_now == "true" %}
+                        <div style="width: 340px;">
+                            {{i.shouhin_num}}　{{i.shouhin_name}}
+                        </div>
+                        {% endif %}
+                        <div class="flex3">
+                            <div style="width: 200px;">{{i.color}}</div>
+                            <div style="width: 150px;">{{i.size}}</div>
+                        </div>
+                    </div>
                     <div style="width: 240px; cursor: pointer;" title="{{i.tana}}">
                         <span class="tana_icon">棚</span> {% if i.tana %}{{i.tana | truncatechars:15}}{% endif %}
                     </div>

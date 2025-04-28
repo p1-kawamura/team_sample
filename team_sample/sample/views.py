@@ -84,9 +84,9 @@ def index(request):
 
     else:
         if team == "全店舗":
-            item_list=Shouhin.objects.filter(joutai=1).order_by("color","size_num")
+            item_list=Shouhin.objects.filter(joutai=1).order_by("rental_day")
         else:
-            item_list=Shouhin.objects.filter(team=team,joutai=1).order_by("color","size_num")
+            item_list=Shouhin.objects.filter(team=team,joutai=1).order_by("rental_day")
   
 
 

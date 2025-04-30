@@ -233,7 +233,7 @@
                     list='<option></option>';
                 } else {
                     for (var i of response.hinban_list){
-                        list = list + '<option>' + i + '</option>';
+                        list = list + "<option value='" + i + "'>" + i + "</option>";
                     }
                 }
                 document.getElementById("hinban").innerHTML=list;

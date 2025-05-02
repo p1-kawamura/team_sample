@@ -194,6 +194,11 @@
                     <div class="modal-body">
                         <div id="modal_return_sample_1"></div>
                         <div id="modal_return_sample_2" style="margin-top: 10px;"></div>
+                        <div id="modal_return_sample_3" style="margin-top: 10px;"></div>
+                        <div id="modal_return_sample_4" style="margin-top: 10px;"></div>
+                        <div id="modal_return_sample_5" style="margin-top: 10px;"></div>
+                        <div id="modal_return_sample_6" style="margin-top: 10px;"></div>
+                        <div id="modal_return_sample_7" style="margin-top: 10px;"></div>
                     </div>
                     <div class="modal-footer">
                         <div class="flex">
@@ -227,7 +232,7 @@
                             </div>
                             <div class="flex3 mt-4">
                                 <div>顧客名：</div>
-                                <div><input class="form-control" type="text" id="rental_cus" style="width: 400px;"></div>
+                                <div><input class="form-control" type="text" id="rental_cus" style="width: 385px;"></div>
                             </div>
                             <div class="mt-5">
                                 <button type="button" class="btn btn-outline-primary" id="rental_ok" style="height: 4em;">
@@ -424,9 +429,14 @@
                     })
                     .done(function(response){
                         res=response.sample;
-                        document.getElementById("modal_return_num").innerText=hontai_num;
-                        document.getElementById("modal_return_sample_1").innerText="店舗：" + res[0];
-                        document.getElementById("modal_return_sample_2").innerText=res[1];
+                        document.getElementById("modal_return_num").innerText=res["hontai_num"];
+                        document.getElementById("modal_return_sample_1").innerText="店舗：" + res["team"];
+                        document.getElementById("modal_return_sample_2").innerText="品番：" + res["shouhin_num"];
+                        document.getElementById("modal_return_sample_3").innerText="品名：" + res["shouhin_name"];
+                        document.getElementById("modal_return_sample_4").innerText="カラー：" + res["color"];
+                        document.getElementById("modal_return_sample_5").innerText="サイズ：" + res["size"];
+                        document.getElementById("modal_return_sample_6").innerText="担当者：" + res["rental_tantou"];
+                        document.getElementById("modal_return_sample_7").innerText="顧客名：" + res["rental_cus"];
                     });
                 });
             };

@@ -211,9 +211,9 @@ def rental_ok(request):
 # 返却モーダル
 def return_modal(request):
     hontai_num=request.POST.get("hontai_num")
-    ins=Shouhin.objects.get(hontai_num=hontai_num)
-    shouhin=ins.shouhin_num + "　" + ins.shouhin_name + "　" + ins.color + "　" + ins.size
-    d={"sample":[ins.team,shouhin]}
+    ins=list(Shouhin.objects.filter(hontai_num=hontai_num).values())
+    d={"sample":ins[0]}
+    print(d)
     return JsonResponse(d)
 
 

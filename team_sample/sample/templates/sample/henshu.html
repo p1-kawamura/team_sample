@@ -142,6 +142,7 @@
                                 <select class="form-select" id="up_joutai">
                                     <option value="0">あり</option>
                                     <option value="1">貸出中</option>
+                                    <option value="2">廃番</option>
                                 </select>
                             </div>
                         </div>
@@ -269,8 +270,10 @@
                     for (var i of res){
                         if (i.joutai == 0){
                             rental="あり";
-                        } else {
+                        } else if(i.joutai ==1){
                             rental="貸出中";
+                        } else{
+                            rental="廃番";
                         };
                         str=str + "<div class='flex2 main_henshu' id='" + i.hontai_num + "' name='henshu_item'>" + 
                             "<div style='width:100px;'>" + i.shouhin_num + "</div>" + 

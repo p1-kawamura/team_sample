@@ -18,7 +18,7 @@ class Shouhin(models.Model):
     def __str__(self):
         return self.shouhin_name
     
-    # joutai（状態）　0:在庫有り　1:貸出中
+    # joutai（状態）　0:在庫有り　1:貸出中　2:廃番
 
 
 class Size(models.Model):

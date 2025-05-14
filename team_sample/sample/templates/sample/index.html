@@ -135,8 +135,10 @@
         <!-- 商品リスト -->
         <div class="mt-4" id="item_list" style="margin: 0 auto; width: 1100px;">
             {% for i in item_list %}
-                {% if i.rental_day %}
+                {% if i.joutai == 1 %}
                 <div class="flex3 main_all main_rental">
+                {% elif i.joutai == 2 %}
+                <div class="flex3 main_all main_haiban">
                 {% elif i.team == "東京" %}
                 <div class="flex3 main_all main_tokyo">
                 {% elif i.team == "大阪" %}
@@ -148,8 +150,10 @@
                 {% endif %}
                     <div style="width: 65px;">{{i.team}}</div>
                     <div style="width: 105px;">
-                        {% if i.rental_day %}
+                        {% if i.joutai == 1 %}
                         <div class="rental_icon" title="■貸出日：{{i.rental_day}}　■担当：{{i.rental_tantou}}　■顧客：{{i.rental_cus}}">貸出中</div>
+                        {% elif i.joutai == 2 %}
+                        <div class="haiban_icon">廃番</div>
                         {% endif %}
                     </div>
                     <div>
@@ -170,10 +174,10 @@
                         <span class="tana_icon">備</span> {% if i.bikou %}{{i.bikou | truncatechars:15}}{% endif %}
                     </div>
                     <div style="text-align: right; width: 50px;">
-                        {% if i.rental_day %}
+                        {% if i.joutai == 1 %}
                         <button type="button" class="btn btn-outline-danger btn-sm" id="return_{{i.hontai_num}}" name="btn_return"
                             data-bs-toggle="modal" data-bs-target="#return_modal">返却</button>
-                        {% else %}
+                        {% elif i.joutai == 0 %}
                         <button type="button" class="btn btn-outline-primary btn-sm" id="rental_{{i.hontai_num}}" name="btn_rental"
                             data-bs-toggle="modal" data-bs-target="#rental_modal">貸出</button>
                         {% endif %}

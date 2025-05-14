@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from .views import index,hinban_enter,free,hinban_click,team_color_size_click,rental_now,rental_modal,rental_basket,rental_ok, \
-        return_modal,return_ok,henshu_index,henshu_hinban_click,henshu_list_click,henshu_up,henshu_del, \
+        return_modal,return_ok,henshu_index,henshu_hinban_click,henshu_list_click,henshu_team_tana,henshu_up,henshu_del, \
             size_index,size_num,size_name,size_new,size_del,size_sample,csv_index,csv_imp
 
 
@@ -22,6 +22,7 @@ urlpatterns = [
     path('henshu_index/', henshu_index, name="henshu_index"),
     path('henshu_hinban_click/', henshu_hinban_click, name="henshu_hinban_click"),
     path('henshu_list_click/', henshu_list_click, name="henshu_list_click"),
+    path('henshu_team_tana/', henshu_team_tana, name="henshu_team_tana"),
     path('henshu_up/', henshu_up, name="henshu_up"),
     path('henshu_del/', henshu_del, name="henshu_del"),
     path('size_index/', size_index, name="size_index"),

@@ -213,7 +213,6 @@ def return_modal(request):
     hontai_num=request.POST.get("hontai_num")
     ins=list(Shouhin.objects.filter(hontai_num=hontai_num).values())
     d={"sample":ins[0]}
-    print(d)
     return JsonResponse(d)
 
 
@@ -236,10 +235,13 @@ def henshu_index(request):
     team=request.session["team"]
     team_list=["","東京","大阪","高松","福岡"]
     size_list=Size.objects.all()
+    if team !="":
+        tana_list=list(Shouhin.objects.filter(team=team).values_list("tana",flat=True).order_by("tana").distinct())
     params={
         "team":team,
         "team_list":team_list,
         "size_list":size_list,
+        "tana_list":tana_list,
     }
     return render(request,"sample/henshu.html",params)
 
@@ -258,6 +260,15 @@ def henshu_list_click(request):
     hontai_num=request.POST.get("hontai_num")
     item=list(Shouhin.objects.filter(hontai_num=hontai_num).values())[0]
     d={"item":item}
+    return JsonResponse(d)
+
+
+# 編集_店舗クリック_棚番
+def henshu_team_tana(request):
+    team=request.POST.get("team")
+    tana_list=[]
+    tana_list=list(Shouhin.objects.filter(team=team).values_list("tana",flat=True).order_by("tana").distinct())
+    d={"tana_list":tana_list}
     return JsonResponse(d)
 
 

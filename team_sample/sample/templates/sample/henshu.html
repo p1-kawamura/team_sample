@@ -119,7 +119,14 @@
                 </div>
                 <div style="margin-left: 30px;">
                     <div>棚番</div>
-                    <div><input class="form-control" type="text" id="up_tana" style="width: 270px;"></div>
+                    <div>
+                        <input list="size_list" class="form-control" type="text" id="up_tana" style="width: 270px;">
+                        <datalist id="size_list">
+                            {% for tana in tana_list %}
+                            <option value="{{tana}}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
                 </div>
             </div>
             <div class="mt-2 flex2">
@@ -243,8 +250,8 @@
 
         //品番選択
         var hinban = document.getElementById("hinban");
-        var team = document.getElementById("team_select");
         hinban.addEventListener("click",function(){
+            var team = document.getElementById("team_select");
             if (hinban.value != "" && team.value != ""){
                 $.ajax({
                     'url': '{% url "sample:henshu_hinban_click" %}',
@@ -315,7 +322,7 @@
                         document.getElementById("up_rental_cus").value=res.rental_cus;
                         document.getElementById("up_bikou").value=res.bikou;
                         document.getElementById("up_btn").className="btn btn-success";
-                        document.getElementById("up_btn").innerHTML="<i class='bi bi-upload'></i> 内容更新";                            
+                        document.getElementById("up_btn").innerHTML="<i class='bi bi-upload'></i> 内容更新";
                     });
                 });
             };
@@ -366,9 +373,34 @@
             document.getElementById("up_rental_cus").value="";
             document.getElementById("up_bikou").value="";
             document.getElementById("up_btn").className="btn btn-primary";
-            document.getElementById("up_btn").innerHTML="<i class='bi bi-plus-lg'></i> 新規登録";  
+            document.getElementById("up_btn").innerHTML="<i class='bi bi-plus-lg'></i> 新規登録";
+            tana();
         };
 
+
+        // 店舗選択_棚番
+        document.getElementById("up_team").addEventListener("change",function(){
+            tana();
+        })
+
+        // 棚番リスト
+        function tana(){
+            team=document.getElementById("up_team").value;
+            $.ajax({
+                'url': '{% url "sample:henshu_team_tana" %}',
+                'type': 'POST',
+                'data': {'team': document.getElementById("up_team").value},
+                'dataType': 'json'
+            })
+            .done(function(response){
+                res=response.tana_list;
+                var str ="";
+                for (var i of res){
+                    str= str + "<option value='" + i + "'>"
+                }
+                document.getElementById("size_list").innerHTML=str;
+            });
+        }
 
         // 登録・更新
         document.getElementById("up_btn").addEventListener("click",function(){

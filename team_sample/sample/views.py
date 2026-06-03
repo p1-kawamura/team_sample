@@ -6,6 +6,9 @@ from django.http import JsonResponse
 import io
 import csv
 import json
+from openpyxl import Workbook
+from django.http import HttpResponse
+import urllib.parse
 
 
 
@@ -406,6 +409,48 @@ def size_sample(request):
     size_sample=list(Shouhin.objects.filter(size=size_name).values())
     d={"size_sample":size_sample}
     return JsonResponse(d)
+
+
+# サンプル一覧_XLSX出力
+def sample_all_xlsx(request):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "店舗サンプル一覧"
+
+    ins = Shouhin.objects.all()
+    ws.append(["店舗", "品番", "品名", "カラー","サイズ","棚番","備考","状態","貸出日","担当","顧客"])
+    for i in ins:
+        if i.joutai==0:
+            sample_status="在庫あり"
+        elif i.joutai==1:
+            sample_status="貸出中"
+        elif i.joutai==2:
+            sample_status="廃番"
+
+        ws.append([
+            i.team,
+            i.shouhin_num,
+            i.shouhin_name,
+            i.color,
+            i.size,
+            i.tana,
+            i.bikou,
+            sample_status,
+            i.rental_day,
+            i.rental_tantou,
+            i.rental_cus
+        ])
+
+    filename = urllib.parse.quote("店舗サンプル一覧.xlsx")
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response['Content-Disposition'] = (
+        "attachment; filename='{}'; filename*=UTF-8''{}".format(filename, filename)
+    )
+
+    wb.save(response)
+    return response
 
 
 # CSVページ

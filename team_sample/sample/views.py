@@ -512,15 +512,5 @@ def csv_imp(request):
 
 
 def free(request):
-    #廃番指定
-    data = io.TextIOWrapper(request.FILES['csv1'].file, encoding="cp932")
-    csv_content = csv.reader(data)
-    csv_list=list(csv_content)
-    h=0
-    for i in csv_list:
-        if h!=0:
-            ins=Shouhin.objects.get(pk=i[0])
-            ins.joutai=2
-            ins.save()
-        h+=1
+    print("test")
     return redirect("sample:index")

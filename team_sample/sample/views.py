@@ -472,27 +472,39 @@ def csv_imp(request):
     #         size=i[1],
     #     )
 
-    # 商品データ
+    # # 商品データ
+    # data = io.TextIOWrapper(request.FILES['csv1'].file, encoding="cp932")
+    # csv_content = csv.reader(data)
+    # csv_list=list(csv_content)
+    # h=0
+    # for i in csv_list:
+    #     if h!=0:
+    #         Shouhin.objects.create(
+    #             team=i[0],
+    #             shouhin_num=i[1],
+    #             shouhin_name=i[2],
+    #             color=i[3],
+    #             size=i[4],
+    #             size_num=i[5],
+    #             tana=i[6],
+    #             bikou=i[7],
+    #             joutai=i[8],
+    #             rental_day=i[9],
+    #             rental_tantou=i[10],
+    #             rental_cus=i[11],
+    #         )
+    #     h+=1
+
+    #廃番指定
     data = io.TextIOWrapper(request.FILES['csv1'].file, encoding="cp932")
     csv_content = csv.reader(data)
     csv_list=list(csv_content)
     h=0
     for i in csv_list:
         if h!=0:
-            Shouhin.objects.create(
-                team=i[0],
-                shouhin_num=i[1],
-                shouhin_name=i[2],
-                color=i[3],
-                size=i[4],
-                size_num=i[5],
-                tana=i[6],
-                bikou=i[7],
-                joutai=i[8],
-                rental_day=i[9],
-                rental_tantou=i[10],
-                rental_cus=i[11],
-            )
+            ins=Shouhin.objects.get(pk=i[0])
+            ins.joutai=2
+            ins.save()
         h+=1
 
     return render(request,"sample/csv_imp.html",{"ans":"yes"})
@@ -500,26 +512,15 @@ def csv_imp(request):
 
 
 def free(request):
-    #サンプルリスト初回取込
+    #廃番指定
     data = io.TextIOWrapper(request.FILES['csv1'].file, encoding="cp932")
     csv_content = csv.reader(data)
     csv_list=list(csv_content)
     h=0
     for i in csv_list:
         if h!=0:
-            Shouhin.objects.create(
-                team=i[0],
-                shouhin_num=i[1],
-                shouhin_name=i[2],
-                color=i[3],
-                size=i[4],
-                size_num=i[5],
-                tana=i[6],
-                bikou=i[7],
-                joutai=i[8],
-                rental_day=i[9],
-                rental_tantou=i[10],
-                rental_cus=i[11],
-            )
+            ins=Shouhin.objects.get(pk=i[0])
+            ins.joutai=2
+            ins.save()
         h+=1
     return redirect("sample:index")

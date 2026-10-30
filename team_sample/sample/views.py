@@ -418,7 +418,7 @@ def sample_all_xlsx(request):
     ws.title = "店舗サンプル一覧"
 
     ins = Shouhin.objects.all()
-    ws.append(["店舗", "品番", "品名", "カラー","サイズ","棚番","備考","状態","貸出日","担当","顧客"])
+    ws.append(["ID","店舗", "品番", "品名", "カラー","サイズ","棚番","備考","状態","貸出日","担当","顧客"])
     for i in ins:
         if i.joutai==0:
             sample_status="在庫あり"
@@ -428,6 +428,7 @@ def sample_all_xlsx(request):
             sample_status="廃番"
 
         ws.append([
+            i.pk,
             i.team,
             i.shouhin_num,
             i.shouhin_name,
